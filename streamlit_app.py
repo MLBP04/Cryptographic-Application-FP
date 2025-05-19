@@ -453,3 +453,36 @@ elif choice == "Asymmetric Encryption/Decryption":
                 st.success(f"Shared secret established: {ka}")
             else:
                 st.error("Shared secrets do not match!")
+
+elif choice == "Hashing Functions":
+    st.header("Hashing")
+    tab1, tab2 = st.tabs(["Text", "File"])
+    with tab1:
+        algo = st.selectbox("Algorithm", ["sha256", "sha512", "md5", "sha1"])
+        text = st.text_area("Text to Hash")
+        if st.button("Hash Text"):
+            try:
+                result = hash_text(text, algo)
+                st.code(result)
+            except Exception as e:
+                st.error(str(e))
+    with tab2:
+        algo = st.selectbox("Algorithm (File)", ["sha256", "sha512", "md5", "sha1"])
+        uploaded_file = st.file_uploader("Upload File for Hashing", type=None, key="hashfile")
+        if uploaded_file and st.button("Hash File"):
+            try:
+                # Preview file content (first 500 chars for safety)
+                file_bytes = uploaded_file.read()
+                preview_text = file_bytes[:500].decode(errors="ignore")
+                st.text_area("File Content Preview", preview_text, height=150, key="hash_file_preview")
+                uploaded_file.seek(0)
+                result = hash_file(uploaded_file, algo)
+                # (do not delete) st.code(result)
+                st.download_button(
+                    "Download Result",
+                    data=result.encode(),
+                    file_name="hash_result.txt",
+                    key="hash_file_download"
+                )
+            except Exception as e:
+                st.error(str(e))
