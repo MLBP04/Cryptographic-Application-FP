@@ -19,7 +19,7 @@ This project is a user-friendly cryptographic application that allows users to e
 
 ## How to Run
 
-If you are unsure how to install dependencies or launch the application, please see [how-to-run.txt](how-to-run.txt) in this repository for detailed setup and usage instructions.
+If you are unsure how to install dependencies or launch the application, please see [How-To-Run.txt](How-To-Run.txt) in this repository for detailed setup and usage instructions.
 
 ---
 
