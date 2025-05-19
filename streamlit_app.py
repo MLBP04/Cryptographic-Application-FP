@@ -271,3 +271,129 @@ def dh_demo_generate_keys(P, G, a, b):
     ka = dh_power(y, a, P)
     kb = dh_power(x, b, P)
     return x, y, ka, kb
+
+# --- UI Logic ---
+
+if choice == "Symmetric Encryption/Decryption":
+    st.header("Symmetric Encryption/Decryption")
+    tab1, tab2 = st.tabs(["Text", "File"])
+    with tab1:
+        algo = st.selectbox("Algorithm", ["Block Cipher (XOR)", "Caesar Cipher (multi-key)", "Vigenère Cipher"])
+        mode = st.radio("Mode", ["Encrypt", "Decrypt"])
+        text = st.text_area("Text")
+        if algo == "Block Cipher (XOR)":
+            key = st.text_input("Key (exactly 8 characters)", value="my8chark")
+            if st.button("Run"):
+                if len(key) != 8:
+                    st.error("Key must be exactly 8 characters")
+                else:
+                    try:
+                        if mode == "Encrypt":
+                            result = xor_block_encrypt(text, key)
+                        else:
+                            result = xor_block_decrypt(text, key)
+                        st.code(result)
+                    except Exception as e:
+                        st.error(str(e))
+        elif algo == "Caesar Cipher (multi-key)":
+            shift_keys_str = st.text_input("Shift Keys (space-separated integers)", value="3 1 4")
+            try:
+                shift_keys = list(map(int, shift_keys_str.strip().split()))
+            except Exception:
+                shift_keys = []
+            if st.button("Run"):
+                if len(shift_keys) < 2 or len(shift_keys) > len(text):
+                    st.error("Shift keys length must be between 2 and the length of the text.")
+                else:
+                    try:
+                        if mode == "Encrypt":
+                            cipher_text, enc_report = caesar_encrypt_decrypt(text, shift_keys, ifdecrypt=False, show_report=True)
+                            decrypted_text, dec_report = caesar_encrypt_decrypt(cipher_text, shift_keys, ifdecrypt=True, show_report=True)
+                            enc_title = "Encryption Steps"
+                            dec_title = "Decryption Steps"
+                        else:
+                            cipher_text, enc_report = caesar_encrypt_decrypt(text, shift_keys, ifdecrypt=True, show_report=True)
+                            decrypted_text, dec_report = caesar_encrypt_decrypt(cipher_text, shift_keys, ifdecrypt=False, show_report=True)
+                            enc_title = "Decryption Steps"
+                            dec_title = "Encryption Steps (Re-Encrypt)"
+                        # Present results in a more readable, styled way
+                        st.markdown(f"### {enc_title}")
+                        st.markdown(f"<pre style='background:#f6f8fa;border-radius:6px;padding:10px'>{enc_report}</pre>", unsafe_allow_html=True)
+                        st.markdown(f"### {dec_title}")
+                        st.markdown(f"<pre style='background:#f6f8fa;border-radius:6px;padding:10px'>{dec_report}</pre>", unsafe_allow_html=True)
+                        st.markdown("---")
+                        st.markdown(f"<b>Text:</b> <code>{text}</code>", unsafe_allow_html=True)
+                        st.markdown(f"<b>Shift keys:</b> <code>{' '.join(map(str, shift_keys))}</code>", unsafe_allow_html=True)
+                        st.markdown(f"<b>Cipher:</b> <code>{cipher_text}</code>", unsafe_allow_html=True)
+                        st.markdown(f"<b>Decrypted text:</b> <code>{decrypted_text}</code>", unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(str(e))
+        elif algo == "Vigenère Cipher":
+            alphabet = st.text_input("Alphabet (unique chars, e.g. ZYXWVUTSRQPONMLKJIHGFEDCBA)", value="ZYXWVUTSRQPONMLKJIHGFEDCBA")
+            key = st.text_input("Vigenère Key (letters only)", value="KEY")
+            if st.button("Run"):
+                try:
+                    if mode == "Encrypt":
+                        result = vigenere_encrypt(text, key, alphabet)
+                    else:
+                        result = vigenere_decrypt(text, key, alphabet)
+                    st.code(result)
+                except Exception as e:
+                    st.error(str(e))
+    with tab2:
+        algo = st.selectbox("Algorithm (File)", ["Block Cipher (XOR)", "Caesar Cipher (multi-key)", "Vigenère Cipher"])
+        mode = st.radio("Mode (File)", ["Encrypt", "Decrypt"])
+        uploaded_file = st.file_uploader("Upload File", type=None)
+        if uploaded_file:
+            if algo == "Block Cipher (XOR)":
+                key = st.text_input("Key (exactly 8 characters)", value="my8chark", key="file_xor_key")
+                if st.button("Run File Crypto", key="file_xor_btn"):
+                    if len(key) != 8:
+                        st.error("Key must be exactly 8 characters")
+                    else:
+                        try:
+                            file_bytes = uploaded_file.read()
+                            text = file_bytes.decode(errors='ignore')
+                            if mode == "Encrypt":
+                                out = xor_block_encrypt(text, key)
+                                out_bytes = out.encode()
+                            else:
+                                out = xor_block_decrypt(text, key)
+                                out_bytes = out.encode()
+                            st.download_button("Download Result", data=out_bytes, file_name="result.txt", key="file_xor_download")
+                            st.text_area("File Content Preview", text, height=150, key="file_xor_preview")
+                        except Exception as e:
+                            st.error(str(e))
+            elif algo == "Caesar Cipher (multi-key)":
+                shift_keys_str = st.text_input("Shift Keys (space-separated integers)", value="3 1 4", key="file_caesar_keys")
+                if st.button("Run File Crypto", key="file_caesar_btn"):
+                    try:
+                        shift_keys = list(map(int, shift_keys_str.strip().split()))
+                        file_bytes = uploaded_file.read()
+                        text = file_bytes.decode(errors='ignore')
+                        if len(shift_keys) < 2 or len(shift_keys) > len(text):
+                            st.error("Shift keys length must be between 2 and the length of the file content.")
+                        else:
+                            if mode == "Encrypt":
+                                out = caesar_encrypt_decrypt(text, shift_keys, ifdecrypt=False)
+                            else:
+                                out = caesar_encrypt_decrypt(text, shift_keys, ifdecrypt=True)
+                            st.download_button("Download Result", data=out.encode(), file_name="result.txt", key="file_caesar_download")
+                            st.text_area("File Content Preview", text, height=150, key="file_caesar_preview")
+                    except Exception as e:
+                        st.error(str(e))
+            elif algo == "Vigenère Cipher":
+                alphabet = st.text_input("Alphabet (unique chars, e.g. ZYXWVUTSRQPONMLKJIHGFEDCBA)", value="ZYXWVUTSRQPONMLKJIHGFEDCBA", key="file_vigenere_alphabet")
+                key = st.text_input("Vigenère Key (letters only)", value="KEY", key="file_vigenere_key")
+                if st.button("Run File Crypto", key="file_vigenere_btn"):
+                    try:
+                        file_bytes = uploaded_file.read()
+                        text = file_bytes.decode(errors='ignore')
+                        if mode == "Encrypt":
+                            out = vigenere_encrypt(text, key, alphabet)
+                        else:
+                            out = vigenere_decrypt(text, key, alphabet)
+                        st.download_button("Download Result", data=out.encode(), file_name="result.txt", key="file_vigenere_download")
+                        st.text_area("File Content Preview", text, height=150, key="file_vigenere_preview")
+                    except Exception as e:
+                        st.error(str(e))
