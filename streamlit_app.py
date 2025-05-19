@@ -397,3 +397,59 @@ if choice == "Symmetric Encryption/Decryption":
                         st.text_area("File Content Preview", text, height=150, key="file_vigenere_preview")
                     except Exception as e:
                         st.error(str(e))
+
+elif choice == "Asymmetric Encryption/Decryption":
+    st.header("Asymmetric Encryption/Decryption")
+    algo = st.selectbox("Algorithm", ["RSA (PyCryptodome)", "Diffie-Hellman"])
+    mode = st.radio("Mode", ["Encrypt", "Decrypt"])
+    text = st.text_area("Text")
+    if algo == "RSA (PyCryptodome)":
+        priv, pub = st.columns(2)
+        with priv:
+            if 'rsa_priv_val' not in st.session_state:
+                st.session_state['rsa_priv_val'] = ""
+            if 'rsa_pub_val' not in st.session_state:
+                st.session_state['rsa_pub_val'] = ""
+            private_key = st.text_area("Private Key (PEM)", height=150, value=st.session_state['rsa_priv_val'], key="rsa_priv_pem")
+            if st.button("Generate RSA Keys"):
+                priv_key, pub_key = rsa_generate_keys()
+                st.session_state['rsa_priv_val'] = priv_key.decode()
+                st.session_state['rsa_pub_val'] = pub_key.decode()
+                try:
+                    st.rerun()
+                except AttributeError:
+                    import streamlit as stlib
+                    if hasattr(stlib, "experimental_rerun"):
+                        stlib.experimental_rerun()
+        with pub:
+            public_key = st.text_area("Public Key (PEM)", height=150, value=st.session_state['rsa_pub_val'], key="rsa_pub_pem")
+        if st.button("Run RSA"):
+            try:
+                if mode == "Encrypt":
+                    result = rsa_encrypt(public_key, text)
+                else:
+                    result = rsa_decrypt(private_key, text)
+                st.code(result)
+            except Exception as e:
+                st.error(str(e))
+    elif algo == "Diffie-Hellman":
+        st.markdown("#### Diffie-Hellman Key Exchange (educational, small primes)")
+        # Default values for demonstration
+        P = st.number_input("Prime number P", min_value=3, value=23, step=1)
+        G = st.number_input("Primitive root G", min_value=2, value=9, step=1)
+        a = st.number_input("Alice's private key (a)", min_value=1, value=4, step=1)
+        b = st.number_input("Bob's private key (b)", min_value=1, value=3, step=1)
+        if st.button("Run DH Demo"):
+            x, y, ka, kb = dh_demo_generate_keys(P, G, a, b)
+            st.markdown(f"**The value of P:** {P}")
+            st.markdown(f"**The value of G:** {G}")
+            st.markdown(f"**The private key a for Alice:** {a}")
+            st.markdown(f"**The private key b for Bob:** {b}")
+            st.markdown(f"**Alice computes:** x = G^a mod P = {G}^{a} mod {P} = {x}")
+            st.markdown(f"**Bob computes:** y = G^b mod P = {G}^{b} mod {P} = {y}")
+            st.markdown(f"**Alice computes secret key:** ka = y^a mod P = {y}^{a} mod {P} = {ka}")
+            st.markdown(f"**Bob computes secret key:** kb = x^b mod P = {x}^{b} mod {P} = {kb}")
+            if ka == kb:
+                st.success(f"Shared secret established: {ka}")
+            else:
+                st.error("Shared secrets do not match!")
