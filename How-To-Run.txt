@@ -1,0 +1,179 @@
+# How to Run the Cryptographic Application
+
+This guide explains how to set up and run the Streamlit-based cryptographic application.
+
+---
+
+## 1. Prerequisites
+
+- **Python 3.8+** (recommended: Python 3.10 or newer)
+- **pip** (Python package manager)
+- **Supported OS:** Windows, macOS, Linux
+
+### Required Python Packages
+
+- `streamlit`
+- `pycryptodome`
+- `cryptography`
+
+You can install all required packages using the following command:
+
+```sh
+pip install streamlit pycryptodome cryptography
+```
+
+---
+
+## 2. Download the Application
+
+Ensure you have all the application files, especially:
+
+- `streamlit_app.py`
+- `how-to-run.txt`
+- (Any other supporting files in this directory)
+
+**Directory structure example:**
+```
+Cryptographic-Application-FP/
+  ├─ streamlit_app.py
+  ├─ how-to-run.txt
+  ├─ requirements.txt
+  ├─ README.md
+  └─ (any other supporting files)
+```
+*(Place the folder anywhere on your computer, such as your Desktop or Documents folder.)*
+
+---
+
+## 3. (Optional) Using Git to Clone the Repository
+
+If the project is hosted on a Git repository (e.g., GitHub), you can clone it directly:
+
+```sh
+git clone https://github.com/your-username/Cryptographic-Application-FP.git
+cd Cryptographic-Application-FP
+```
+
+- To update your local copy to the latest version later:
+  ```sh
+  git pull
+  ```
+
+If you make changes and want to track them with git:
+
+```sh
+git status
+git add .
+git commit -m "Describe your changes"
+git push
+```
+
+*(Replace the repository URL with the actual one if different.)*
+
+---
+
+## 4. Running the Application
+
+Open a terminal or command prompt, navigate to the project directory. For example, if you placed the folder on your Desktop:
+
+**On Windows:**
+```sh
+cd "%USERPROFILE%\Desktop\Cryptographic-Application-FP"
+```
+**On macOS/Linux:**
+```sh
+cd ~/Desktop/Cryptographic-Application-FP
+```
+
+Then start the Streamlit app:
+
+```sh
+streamlit run streamlit_app.py
+```
+
+- By default, Streamlit runs on port 8501. If this port is in use, you can specify another port:
+  ```sh
+  streamlit run streamlit_app.py --server.port 8502
+  ```
+- The app will launch in your default web browser. If it does not open automatically, follow the URL shown in the terminal (e.g., http://localhost:8501).
+
+---
+
+## 5. Using the Application
+
+### Main Features
+
+- **Symmetric Encryption/Decryption**
+  - Block Cipher (XOR)
+  - Caesar Cipher (multi-key)
+  - Vigenère Cipher
+- **Asymmetric Encryption/Decryption**
+  - RSA (PyCryptodome)
+  - Diffie-Hellman Key Exchange
+- **Hashing Functions**
+  - SHA-256, SHA-512, MD5, SHA-1
+- **Algorithm Informations**
+  - Descriptions and references for all supported algorithms
+
+### Navigation
+
+- Use the sidebar to select the desired cryptographic function.
+- Each section provides input fields and buttons for running encryption, decryption, or hashing.
+- File operations allow you to upload and process files directly.
+- Download buttons are provided for saving results.
+
+### File Uploads
+
+- You can upload files for encryption, decryption, or hashing.
+- **Maximum file size:** By default, Streamlit allows up to 200MB per file. You can change this in `.streamlit/config.toml` if needed.
+- Uploaded files are processed in-memory and not saved to disk.
+
+### Session State
+
+- Some features (e.g., RSA key generation) use Streamlit's session state to persist values between reruns.
+- If you refresh the page, session state may reset.
+
+---
+
+## 6. Notes
+
+- **Security:** This application is for educational and demonstration purposes. Do not use it for real-world secure communications.
+- **Key Requirements:** Some algorithms require keys of specific lengths or formats (e.g., XOR block cipher requires an 8-character key).
+- **Text Encoding:** For best results, use plain text (UTF-8) files. Non-text files may not be processed correctly.
+- **Error Handling:** The app will display error messages for invalid inputs, key mismatches, or unsupported file types.
+
+---
+
+## 7. Troubleshooting
+
+- If you encounter missing package errors, re-run the `pip install` command above.
+- For Unicode or decoding errors, ensure your input files are plain text or use UTF-8 encoding.
+- If the app does not start, ensure you are using a compatible Python version and that all dependencies are installed.
+- If you see "Address already in use," try a different port (see above).
+- For Streamlit issues, see [Streamlit Troubleshooting](https://docs.streamlit.io/library/get-started/troubleshooting).
+
+---
+
+## 8. Customization
+
+- You can modify `streamlit_app.py` to add or change cryptographic algorithms.
+- To change the default port or file upload size, create or edit `.streamlit/config.toml` in the project directory:
+  ```
+  [server]
+  port = 8501
+  maxUploadSize = 200
+  ```
+
+---
+
+## 9. References
+
+- [Streamlit Documentation](https://docs.streamlit.io/)
+- [PyCryptodome Documentation](https://www.pycryptodome.org/)
+- [cryptography Documentation](https://cryptography.io/)
+
+---
+
+## 10. Contact
+
+For questions or issues, contact the project maintainer or open an issue in your repository (if applicable).
