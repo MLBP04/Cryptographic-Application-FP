@@ -17,6 +17,12 @@ This project is a user-friendly cryptographic application that allows users to e
 
 ---
 
+## How to Run
+
+If you are unsure how to install dependencies or launch the application, please see [how-to-run.txt](how-to-run.txt) in this repository for detailed setup and usage instructions.
+
+---
+
 ## Project Objectives
 
 1. Implement multiple cryptographic algorithms (symmetric, asymmetric, and hashing) for both text and files.
