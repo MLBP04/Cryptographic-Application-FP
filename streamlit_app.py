@@ -22,3 +22,25 @@ MENU = [
     "Algorithm Informations"
 ]
 choice = st.sidebar.selectbox("Navigation", MENU)
+
+# --- Helper Functions ---
+def pad(text, block_size):
+    pad_len = block_size - len(text) % block_size
+    return text + chr(pad_len) * pad_len
+
+def unpad(text):
+    pad_len = ord(text[-1])
+    return text[:-pad_len]
+
+def aes_encrypt(key, plaintext):
+    cipher = AES.new(key, AES.MODE_CBC)
+    ct_bytes = cipher.encrypt(pad(plaintext, AES.block_size).encode())
+    return base64.b64encode(cipher.iv + ct_bytes).decode()
+
+def aes_decrypt(key, ciphertext):
+    raw = base64.b64decode(ciphertext)
+    iv = raw[:AES.block_size]
+    ct = raw[AES.block_size:]
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    pt = cipher.decrypt(ct).decode()
+    return unpad(pt)
