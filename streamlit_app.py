@@ -416,7 +416,7 @@ if choice == "Symmetric Encryption/Decryption":
                             else:
                                 out = xor_block_decrypt(text, key)
                                 out_bytes = out.encode()
-                            st.download_button("Download Result", data=out_bytes, file_name="result.txt", key="file_xor_download")
+                            st.download_button("Download Result", data=out_bytes, file_name="Block_Cipher_Result.txt", key="file_xor_download")
                             st.text_area("File Content Preview", text, height=150, key="file_xor_preview")
                         except Exception as e:
                             st.error(str(e))
@@ -462,7 +462,7 @@ if choice == "Symmetric Encryption/Decryption":
                                 f"Cipher: {cipher_text}\n"
                                 f"Decrypted text: {decrypted_text}\n"
                             )
-                            st.download_button("Download Result", data=result_block.encode(), file_name="caesar_result.txt", key="file_caesar_download")
+                            st.download_button("Download Result", data=result_block.encode(), file_name="Caesar_Cipher_Result.txt", key="file_caesar_download")
                             st.text_area("File Content Preview", text, height=150, key="file_caesar_preview")
                     except Exception as e:
                         st.error(str(e))
@@ -477,7 +477,7 @@ if choice == "Symmetric Encryption/Decryption":
                             out = vigenere_encrypt(text, key, alphabet)
                         else:
                             out = vigenere_decrypt(text, key, alphabet)
-                        st.download_button("Download Result", data=out.encode(), file_name="result.txt", key="file_vigenere_download")
+                        st.download_button("Download Result", data=out.encode(), file_name="Vigenère_Cipher_Result.txt", key="file_vigenere_download")
                         st.text_area("File Content Preview", text, height=150, key="file_vigenere_preview")
                     except Exception as e:
                         st.error(str(e))
@@ -565,7 +565,7 @@ elif choice == "Hashing Functions":
                 st.download_button(
                     "Download Result",
                     data=result.encode(),
-                    file_name="hash_result.txt",
+                    file_name="Hashed_Result.txt",
                     key="hash_file_download"
                 )
             except Exception as e:
@@ -575,25 +575,39 @@ elif choice == "Algorithm Informations":
     st.header("Algorithm Information")
     st.subheader("Symmetric Algorithms")
     st.markdown("""
-- **Block Cipher (AES)**: Advanced Encryption Standard, widely used block cipher, 128/192/256-bit keys.
-- **Stream Cipher (RC4)**: Rivest Cipher 4, stream cipher, variable key length, fast but not recommended for new systems.
-- **Vigenère Cipher**: Classic polyalphabetic substitution cipher using a keyword for shifting letters, mainly of historical interest.
+- **Block Cipher (XOR)**: A simple educational block cipher using XOR operation with a fixed-size key. Not secure for real-world use, but demonstrates the principle of symmetric encryption.
+- **Caesar Cipher (multi-key)**: An extension of the classic Caesar cipher, using a sequence of integer shifts (multi-key) for each character. Useful for illustrating the concept of polyalphabetic substitution.
+- **Vigenère Cipher**: Classic polyalphabetic substitution cipher using a keyword for shifting letters, mainly of historical interest. The Vigenère cipher uses a repeating keyword to determine the shift for each letter, making it more secure than simple Caesar ciphers but still vulnerable to modern cryptanalysis.
     """)
     st.subheader("Asymmetric Algorithms")
     st.markdown("""
-- **RSA**: Rivest–Shamir–Adleman, public-key cryptosystem, widely used for secure data transmission.
-- **Diffie-Hellman**: Key exchange protocol for establishing a shared secret over an insecure channel, often used to derive symmetric keys.
+- **RSA**: Rivest–Shamir–Adleman, public-key cryptosystem, widely used for secure data transmission. RSA relies on the mathematical difficulty of factoring large integers. It is used for encryption, digital signatures, and key exchange.
+- **Diffie-Hellman**: Key exchange protocol for establishing a shared secret over an insecure channel, often used to derive symmetric keys. Diffie-Hellman enables two parties to agree on a secret key without transmitting it directly, forming the basis for many secure communication protocols.
     """)
     st.subheader("Hashing Functions")
     st.markdown("""
-- **SHA-256**: Secure Hash Algorithm 256-bit, widely used for integrity.
-- **SHA-512**: Secure Hash Algorithm 512-bit, stronger variant.
-- **MD5**: Message Digest 5, fast but not collision-resistant.
-- **SHA-1**: Secure Hash Algorithm 1, legacy, not recommended for security.
+- **SHA-256**: Secure Hash Algorithm 256-bit, widely used for integrity. Part of the SHA-2 family, it produces a 256-bit (32-byte) hash value, commonly used in digital signatures and blockchain.
+- **SHA-512**: Secure Hash Algorithm 512-bit, stronger variant of SHA-2, producing a 512-bit (64-byte) hash. Used where higher security or longer hash values are required.
+- **MD5**: Message Digest 5, fast but not collision-resistant. MD5 is now considered broken for security purposes but is still used for checksums and non-cryptographic integrity checks.
+- **SHA-1**: Secure Hash Algorithm 1, legacy, not recommended for security. SHA-1 has known vulnerabilities and should not be used for cryptographic security.
     """)
-    st.subheader("References")
+    st.subheader("General Concepts")
     st.markdown("""
-- [PyCryptodome](https://www.pycryptodome.org/)
-- [cryptography](https://cryptography.io/)
-- [hashlib](https://docs.python.org/3/library/hashlib.html)
+- **Symmetric Encryption:** Uses the same key for both encryption and decryption. Fast and suitable for large data, but key distribution is a challenge.
+- **Asymmetric Encryption:** Uses a pair of keys (public and private). Enables secure key exchange and digital signatures, but is slower than symmetric encryption.
+- **Hash Functions:** Produce a fixed-size digest from arbitrary input. Used for data integrity, password storage, and digital signatures. Good hash functions are one-way and collision-resistant.
+- **Key Management:** The security of cryptographic systems depends on secure key generation, storage, and exchange. Never share private keys or use weak/random keys for real-world security.
+- **Initialization Vector (IV):** Used in block cipher modes (like AES-CBC) to ensure that identical plaintext blocks produce different ciphertexts. IVs should be random and unique for each encryption.
+    """)
+    st.subheader("Further Reading & References")
+    st.markdown("""
+- [PyCryptodome Documentation](https://www.pycryptodome.org/)
+- [cryptography.io](https://cryptography.io/)
+- [Python hashlib Documentation](https://docs.python.org/3/library/hashlib.html)
+- [Wikipedia: Advanced Encryption Standard](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+- [Wikipedia: Caesar cipher](https://en.wikipedia.org/wiki/Caesar_cipher)
+- [Wikipedia: Vigenère cipher](https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher)
+- [Wikipedia: RSA (cryptosystem)](https://en.wikipedia.org/wiki/RSA_(cryptosystem))
+- [Wikipedia: Diffie–Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
+- [Wikipedia: Cryptographic hash function](https://en.wikipedia.org/wiki/Cryptographic_hash_function)
     """)
