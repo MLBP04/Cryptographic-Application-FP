@@ -581,7 +581,7 @@ elif choice == "Algorithm Informations":
     """)
     st.subheader("Asymmetric Algorithms")
     st.markdown("""
-- **RSA (PyCryptoDome) **: Rivest–Shamir–Adleman, public-key cryptosystem, widely used for secure data transmission. RSA relies on the mathematical difficulty of factoring large integers. It is used for encryption, digital signatures, and key exchange.
+- **RSA (PyCryptoDome)**: Rivest–Shamir–Adleman, public-key cryptosystem, widely used for secure data transmission. RSA relies on the mathematical difficulty of factoring large integers. It is used for encryption, digital signatures, and key exchange.
 - **Diffie-Hellman**: Key exchange protocol for establishing a shared secret over an insecure channel, often used to derive symmetric keys. Diffie-Hellman enables two parties to agree on a secret key without transmitting it directly, forming the basis for many secure communication protocols.
     """)
     st.subheader("Hashing Functions")
