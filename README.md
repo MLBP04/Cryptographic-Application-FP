@@ -41,12 +41,12 @@ The application is built using **Streamlit**, a Python-based framework for creat
 
 ### Implemented Cryptographic Algorithms
 
-#### 1. Block Cipher (AES)
+#### 1. Block Cipher (XOR)
 - **Type:** Symmetric
-- **History/Background:** AES (Advanced Encryption Standard) was established by NIST in 2001 as the successor to DES. It is widely used for secure data encryption.
-- **Process:** AES is a block cipher that encrypts data in fixed-size blocks (128 bits) using keys of 128, 192, or 256 bits. It uses multiple rounds of substitution, permutation, and mixing.
-- **Library:** PyCryptodome (`Crypto.Cipher.AES`)
-- **Integration:** Used for both text and file encryption/decryption. Users provide a key, and the app handles padding and IV management.
+- **History/Background:** The XOR cipher is a simple symmetric encryption technique that uses the bitwise exclusive OR (XOR) operation. While not secure for serious cryptographic use, it demonstrates the basic principles of block ciphers and is useful for educational purposes.
+- **Process:** Each byte of the plaintext is XORed with a corresponding byte of the key (repeating the key as needed) to produce the ciphertext. Decryption is performed by applying the same XOR operation with the same key.
+- **Library:** Custom implementation in Python
+- **Integration:** Used for both text and file encryption/decryption. Users provide a key, and the app handles the XOR operation.
 
 #### 2. Caesar Cipher
 - **Type:** Symmetric
