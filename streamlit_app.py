@@ -426,8 +426,10 @@ if choice == "Symmetric Encryption/Decryption":
                             decrypted_text = caesar_encrypt_decrypt(cipher_text, shift_keys, ifdecrypt=False)
                             dec_report = caesar_report(cipher_text, shift_keys, ifdecrypt=False)
                         result_block = (
+                            f"Encryption Report:\n"
                             f"{enc_report}\n"
                             f"----------\n"
+                            f"Decryption Report:\n"
                             f"{dec_report}\n"
                             f"----------\n"
                             f"Text: {text}\n"
