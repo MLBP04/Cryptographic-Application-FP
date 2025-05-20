@@ -552,7 +552,6 @@ if choice == "Symmetric Encryption/Decryption":
                         else:
                             out = vigenere_decrypt(text, key, alphabet)
                             steps = vigenere_steps(text, key, alphabet, encrypt=False)
-                        #st.download_button("Download Result", data=out.encode(), file_name="Vigenère_Cipher_Result.txt", key="file_vigenere_download")
                         st.text_area("File Content Preview", text, height=150, key="file_vigenere_preview")
                         # Download result with steps
                         if steps:
@@ -645,7 +644,6 @@ elif choice == "Hashing Functions":
                 st.text_area("File Content Preview", preview_text, height=150, key="hash_file_preview")
                 uploaded_file.seek(0)
                 result = hash_file(uploaded_file, algo)
-                # (do not delete) st.code(result)
                 st.download_button(
                     "Download Result",
                     data=result.encode(),
