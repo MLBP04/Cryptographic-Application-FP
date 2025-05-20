@@ -147,7 +147,7 @@ CRYPTOGRAPHY
 #### RSA
 **Input Text:**  
 `Confidential`  
-**Private Key**
+**Private Key:**
 `-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----`
 
 **Public Key:**  
