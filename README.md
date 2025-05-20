@@ -90,7 +90,7 @@ The application is built using **Streamlit**, a Python-based framework for creat
 - Each algorithm is accessible via the app's sidebar.
 - Users can input text or upload files, select the desired algorithm, and provide necessary keys or parameters.
 - The app provides instant feedback and results, with options to download encrypted/decrypted files.
-- The "Algorithm Information" section educates users about each algorithm, its background, and its use in the app.
+- The **"Algorithm Information"** section educates users about each algorithm, its background, and its use in the app.
 
 ---
 
@@ -147,6 +147,8 @@ CRYPTOGRAPHY
 #### RSA
 **Input Text:**  
 `Confidential`  
+**Private Key**
+`-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----`
 **Public Key:**  
 `-----BEGIN PUBLIC KEY----- ... -----END PUBLIC KEY-----`  
 **Encrypted Output:**
