@@ -194,26 +194,44 @@ def remove_padding(message, padding_char='_'):
 def xor_operation(block, key):
     return [ord(b) ^ ord(k) for b, k in zip(block, key)]
 
-def xor_block_encrypt(text, key):
+def xor_block_encrypt(text, key, show_steps=False):
     text = pad_message(text)
     result = []
+    steps = []
     for i in range(0, len(text), 8):
         block = text[i:i+8]
         encrypted_block = xor_operation(block, key)
         result.extend(encrypted_block)
-    return ' '.join(format(byte, '02X') for byte in result)
+        if show_steps:
+            step_lines = []
+            for j, (b, k) in enumerate(zip(block, key)):
+                step_lines.append(f"Block {i//8}, Char {j}: '{b}' XOR '{k}' = {ord(b)} ^ {ord(k)} = {ord(b)^ord(k)} (0x{ord(b)^ord(k):02X})")
+            steps.append('\n'.join(step_lines))
+    if show_steps:
+        return ' '.join(format(byte, '02X') for byte in result), '\n\n'.join(steps)
+    else:
+        return ' '.join(format(byte, '02X') for byte in result)
 
-def xor_block_decrypt(hex_text, key):
+def xor_block_decrypt(hex_text, key, show_steps=False):
     try:
         hex_values = [int(h, 16) for h in hex_text.split()]
     except ValueError:
         return "Error: Invalid hex input for decryption"
     result = []
+    steps = []
     for i in range(0, len(hex_values), 8):
         block = hex_values[i:i+8]
         decrypted_block = ''.join(chr(b ^ ord(k)) for b, k in zip(block, key))
         result.append(decrypted_block)
-    return remove_padding(''.join(result))
+        if show_steps:
+            step_lines = []
+            for j, (b, k) in enumerate(zip(block, key)):
+                step_lines.append(f"Block {i//8}, Char {j}: {b} (0x{b:02X}) XOR '{k}' = {b} ^ {ord(k)} = {b^ord(k)} ('{chr(b^ord(k))}')")
+            steps.append('\n'.join(step_lines))
+    if show_steps:
+        return remove_padding(''.join(result)), '\n\n'.join(steps)
+    else:
+        return remove_padding(''.join(result))
 
 # --- Caesar Cipher (multi-key) Implementation ---
 def caesar_encrypt_decrypt(text, shift_keys, ifdecrypt, show_report=False):
@@ -315,6 +333,39 @@ def dh_demo_generate_keys(P, G, a, b):
     kb = dh_power(x, b, P)
     return x, y, ka, kb
 
+def vigenere_steps(text, key, alphabet, encrypt=True):
+    """
+    Returns a step-by-step string for Vigenère encryption or decryption.
+    Shows every character, marks invalid ones.
+    """
+    if not text or not key or not alphabet:
+        return ""
+    char_to_index = {char: idx for idx, char in enumerate(alphabet)}
+    steps = []
+    # Only count key for valid chars in alphabet (skip spaces and invalids)
+    filtered_text = ''.join([c for c in text if c in alphabet])
+    extended_key = ''.join([key[i % len(key)] for i in range(len(filtered_text))])
+    key_index = 0
+    for i, c in enumerate(text):
+        if c == ' ':
+            steps.append(f"{i}   (space)")
+        elif c not in alphabet:
+            steps.append(f"{i} {c} (not in alphabet, skipped)")
+        else:
+            k = extended_key[key_index]
+            c_idx = char_to_index[c]
+            k_idx = char_to_index[k]
+            if encrypt:
+                res_idx = (c_idx + k_idx) % len(alphabet)
+                res_char = alphabet[res_idx]
+                steps.append(f"{i} {c} + {k} ({c_idx}+{k_idx} mod {len(alphabet)}) = {res_idx} ({res_char})")
+            else:
+                res_idx = (c_idx - k_idx) % len(alphabet)
+                res_char = alphabet[res_idx]
+                steps.append(f"{i} {c} - {k} ({c_idx}-{k_idx} mod {len(alphabet)}) = {res_idx} ({res_char})")
+            key_index += 1
+    return '\n'.join(steps)
+
 # --- UI Logic ---
 
 if choice == "Symmetric Encryption/Decryption":
@@ -325,21 +376,24 @@ if choice == "Symmetric Encryption/Decryption":
         mode = st.radio("Mode", ["Encrypt", "Decrypt"])
         text = st.text_area("Text")
         if algo == "Block Cipher (XOR)":
-            key = st.text_input("Key (exactly 8 characters)", value="my8chark")
+            key = st.text_input("Key (exactly 8 characters)", value="password")
             if st.button("Run"):
                 if len(key) != 8:
                     st.error("Key must be exactly 8 characters")
                 else:
                     try:
                         if mode == "Encrypt":
-                            result = xor_block_encrypt(text, key)
+                            result, steps = xor_block_encrypt(text, key, show_steps=True)
                         else:
-                            result = xor_block_decrypt(text, key)
+                            result, steps = xor_block_decrypt(text, key, show_steps=True)
                         st.code(result)
+                        if steps:
+                            st.markdown("#### Step-by-step process")
+                            st.code(steps)
                     except Exception as e:
                         st.error(str(e))
         elif algo == "Caesar Cipher (multi-key)":
-            shift_keys_str = st.text_input("Shift Keys (space-separated integers)", value="3 1 4")
+            shift_keys_str = st.text_input("Shift Keys (space-separated integers)", value="1 2 3 4 5")
             try:
                 shift_keys = list(map(int, shift_keys_str.strip().split()))
             except Exception:
@@ -391,9 +445,14 @@ if choice == "Symmetric Encryption/Decryption":
                 try:
                     if mode == "Encrypt":
                         result = vigenere_encrypt(text, key, alphabet)
+                        steps = vigenere_steps(text, key, alphabet, encrypt=True)
                     else:
                         result = vigenere_decrypt(text, key, alphabet)
+                        steps = vigenere_steps(text, key, alphabet, encrypt=False)
                     st.code(result)
+                    if steps:
+                        st.markdown("#### Step-by-step process")
+                        st.code(steps)
                 except Exception as e:
                     st.error(str(e))
     with tab2:
@@ -402,7 +461,7 @@ if choice == "Symmetric Encryption/Decryption":
         uploaded_file = st.file_uploader("Upload File", type=None)
         if uploaded_file:
             if algo == "Block Cipher (XOR)":
-                key = st.text_input("Key (exactly 8 characters)", value="my8chark", key="file_xor_key")
+                key = st.text_input("Key (exactly 8 characters)", value="password", key="file_xor_key")
                 if st.button("Run File Crypto", key="file_xor_btn"):
                     if len(key) != 8:
                         st.error("Key must be exactly 8 characters")
@@ -411,17 +470,24 @@ if choice == "Symmetric Encryption/Decryption":
                             file_bytes = uploaded_file.read()
                             text = file_bytes.decode(errors='ignore')
                             if mode == "Encrypt":
-                                out = xor_block_encrypt(text, key)
+                                out, steps = xor_block_encrypt(text, key, show_steps=True)
                                 out_bytes = out.encode()
                             else:
-                                out = xor_block_decrypt(text, key)
+                                out, steps = xor_block_decrypt(text, key, show_steps=True)
                                 out_bytes = out.encode()
-                            st.download_button("Download Result", data=out_bytes, file_name="Block_Cipher_Result.txt", key="file_xor_download")
                             st.text_area("File Content Preview", text, height=150, key="file_xor_preview")
+                            if steps:
+                                combined = f"Result:\n{out}\n\nStep-by-step process:\n{steps}"
+                                st.download_button(
+                                    "Download Result & Steps",
+                                    data=combined.encode(),
+                                    file_name="Block_Cipher_Result_and_Steps.txt",
+                                    key="file_xor_steps_download"
+                                )
                         except Exception as e:
                             st.error(str(e))
             elif algo == "Caesar Cipher (multi-key)":
-                shift_keys_str = st.text_input("Shift Keys (space-separated integers)", value="3 1 4", key="file_caesar_keys")
+                shift_keys_str = st.text_input("Shift Keys (space-separated integers)", value="1 2 3 4 5", key="file_caesar_keys")
                 if st.button("Run File Crypto", key="file_caesar_btn"):
                     try:
                         shift_keys = list(map(int, shift_keys_str.strip().split()))
@@ -462,8 +528,13 @@ if choice == "Symmetric Encryption/Decryption":
                                 f"Cipher: {cipher_text}\n"
                                 f"Decrypted text: {decrypted_text}\n"
                             )
-                            st.download_button("Download Result", data=result_block.encode(), file_name="Caesar_Cipher_Result.txt", key="file_caesar_download")
                             st.text_area("File Content Preview", text, height=150, key="file_caesar_preview")
+                            st.download_button(
+                                "Download Result & Steps",
+                                data=result_block.encode(),
+                                file_name="Caesar_Cipher_Result.txt",
+                                key="file_caesar_download"
+                            )
                     except Exception as e:
                         st.error(str(e))
             elif algo == "Vigenère Cipher":
@@ -475,10 +546,21 @@ if choice == "Symmetric Encryption/Decryption":
                         text = file_bytes.decode(errors='ignore')
                         if mode == "Encrypt":
                             out = vigenere_encrypt(text, key, alphabet)
+                            steps = vigenere_steps(text, key, alphabet, encrypt=True)
                         else:
                             out = vigenere_decrypt(text, key, alphabet)
-                        st.download_button("Download Result", data=out.encode(), file_name="Vigenère_Cipher_Result.txt", key="file_vigenere_download")
+                            steps = vigenere_steps(text, key, alphabet, encrypt=False)
+                        #st.download_button("Download Result", data=out.encode(), file_name="Vigenère_Cipher_Result.txt", key="file_vigenere_download")
                         st.text_area("File Content Preview", text, height=150, key="file_vigenere_preview")
+                        # Download result with steps
+                        if steps:
+                            combined = f"Result:\n{out}\n\nStep-by-step process:\n{steps}"
+                            st.download_button(
+                                "Download Result & Steps",
+                                data=combined.encode(),
+                                file_name="Vigenère_Cipher_Result_and_Steps.txt",
+                                key="file_vigenere_steps_download"
+                            )
                     except Exception as e:
                         st.error(str(e))
 
@@ -581,7 +663,7 @@ elif choice == "Algorithm Informations":
     """)
     st.subheader("Asymmetric Algorithms")
     st.markdown("""
-- **RSA (PyCryptoDome)**: Rivest–Shamir–Adleman, public-key cryptosystem, widely used for secure data transmission. RSA relies on the mathematical difficulty of factoring large integers. It is used for encryption, digital signatures, and key exchange.
+- **RSA (PyCryptoDome) **: Rivest–Shamir–Adleman, public-key cryptosystem, widely used for secure data transmission. RSA relies on the mathematical difficulty of factoring large integers. It is used for encryption, digital signatures, and key exchange.
 - **Diffie-Hellman**: Key exchange protocol for establishing a shared secret over an insecure channel, often used to derive symmetric keys. Diffie-Hellman enables two parties to agree on a secret key without transmitting it directly, forming the basis for many secure communication protocols.
     """)
     st.subheader("Hashing Functions")
