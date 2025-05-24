@@ -204,6 +204,8 @@ Confidential
 
 ---
 
+#### YouTube Link: https://youtu.be/xb4-7hgwZ2U
+
 ## References
 
 - [PyCryptodome Documentation](https://www.pycryptodome.org/)
